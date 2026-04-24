@@ -1,0 +1,41 @@
+-- 1. Клиенттің жалпы жұмсаған сомасын есептеу
+CREATE OR REPLACE FUNCTION get_customer_total(p_cust_id INT) RETURNS DECIMAL AS $$
+BEGIN
+    RETURN (SELECT SUM(total_amount) FROM Orders WHERE customer_id = p_cust_id);
+END;
+$$ LANGUAGE plpgsql;
+
+
+-- 'Арман' есімді клиенттің (ID = 1) жалпы жұмсаған сомасын білу
+SELECT name, get_customer_total(customer_id) AS total_spent
+FROM Customers
+WHERE customer_id = 1;
+
+-- 2. Тағамның жеңілдікпен бағасын алу (10%)
+CREATE OR REPLACE FUNCTION get_discounted_price(p_item_id INT) RETURNS DECIMAL AS $$
+DECLARE v_price DECIMAL;
+BEGIN
+    SELECT price INTO v_price FROM Menu WHERE item_id = p_item_id;
+    RETURN v_price * 0.9;
+END;
+$$ LANGUAGE plpgsql;
+
+
+-- 'Палау' тағамының (ID = 2) жеңілдікпен бағасын тексеру
+SELECT item_name, price AS original_price, get_discounted_price(item_id) AS discounted_price
+FROM Menu
+WHERE item_id = 2;
+
+
+-- Функцияларды JOIN сұраныстарында қолдану
+SELECT 
+    o.order_id, 
+    c.name AS customer, 
+    m.item_name, 
+    m.price, 
+    get_discounted_price(m.item_id) AS promo_price
+FROM Orders o
+JOIN Customers c ON o.customer_id = c.customer_id
+JOIN Order_Items oi ON o.order_id = oi.order_id
+JOIN Menu m ON oi.item_id = m.item_id
+LIMIT 5;
