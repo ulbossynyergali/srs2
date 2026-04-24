@@ -1,0 +1,9 @@
+CREATE TABLE Audit_Log (
+    log_id SERIAL PRIMARY KEY,
+    table_name VARCHAR(50),
+    operation VARCHAR(10),
+    old_data JSONB,
+    new_data JSONB,
+    changed_by VARCHAR(50),
+    changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
