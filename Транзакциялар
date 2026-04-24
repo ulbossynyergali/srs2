@@ -1,0 +1,27 @@
+DO $$ 
+DECLARE 
+    v_order_id INT; 
+BEGIN 
+    INSERT INTO Orders (table_id, staff_id, customer_id, total_amount) 
+    VALUES (1, 1, 1, 0) 
+    RETURNING order_id INTO v_order_id; 
+
+    BEGIN
+        INSERT INTO Order_Items (order_id, item_id, quantity, subtotal) 
+        VALUES (v_order_id, 2, 1, 1800); 
+        
+        RAISE NOTICE 'Тапсырыс №% бөлшектері сәтті қосылды.', v_order_id;
+    EXCEPTION WHEN OTHERS THEN
+        RAISE NOTICE 'Тапсырыс бөлшектерін қосуда қате! Кері қайтарылды.';
+    END;
+
+    RAISE NOTICE 'Транзакция аяқталды. Тапсырыс ID: %', v_order_id;
+END $$;
+
+
+
+-- Orders кестесінде жаңа тапсырыстың пайда болғанын көру
+SELECT * FROM Orders ORDER BY order_id DESC LIMIT 1;
+
+-- Соған сәйкес Order_Items кестесінде тағамның қосылғанын тексеру
+SELECT * FROM Order_Items ORDER BY order_id DESC LIMIT 1;
