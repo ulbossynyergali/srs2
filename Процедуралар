@@ -1,0 +1,38 @@
+-- 1. Жаңа тағам қосу процедурасы
+CREATE OR REPLACE PROCEDURE add_menu_item(
+    p_name VARCHAR, p_cat_id INT, p_price DECIMAL
+) AS $$
+BEGIN
+    INSERT INTO Menu (item_name, category_id, price) VALUES (p_name, p_cat_id, p_price);
+END;
+$$ LANGUAGE plpgsql;
+
+
+-- 'Куырдак' тағамын 2-санатқа (Ыстық тағамдар) 2500 теңге бағасымен қосу
+CALL add_menu_item('Куырдак', 2, 2500);
+SELECT * FROM Menu WHERE item_name = 'Куырдак';
+
+
+-- 2. Қызметкердің телефонын жаңарту
+CREATE OR REPLACE PROCEDURE update_staff_phone(p_id INT, p_phone VARCHAR) AS $$
+BEGIN
+    UPDATE Staff SET phone = p_phone WHERE staff_id = p_id;
+END;
+$$ LANGUAGE plpgsql;
+
+
+-- ID-і 1-ге тең қызметкердің (мысалы, Асхат Әлиев) нөмірін жаңарту
+CALL update_staff_phone(1, '87077777777');
+SELECT staff_id, full_name, phone FROM Staff WHERE staff_id = 1;
+
+-- 3. Үстел статусын өзгерту
+CREATE OR REPLACE PROCEDURE change_table_status(p_table_id INT, p_status VARCHAR) AS $$
+BEGIN
+    UPDATE Restaurant_Tables SET status = p_status WHERE table_id = p_table_id;
+END;
+$$ LANGUAGE plpgsql;
+
+
+-- 3-ші үстелдің статусын 'Бос емес' күйіне ауыстыру
+CALL change_table_status(3, 'Бос емес');
+SELECT table_number, status FROM Restaurant_Tables WHERE table_id = 3;
